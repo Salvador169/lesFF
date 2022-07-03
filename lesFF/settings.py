@@ -85,14 +85,24 @@ WSGI_APPLICATION = 'lesFF.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'parque',
+#         'USER' : 'root',
+#         'PASSWORD' : '',
+#         'HOST' : '127.0.0.1',
+#         'PORT' : '3306',
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'parque',
-        'USER' : 'root',
-        'PASSWORD' : '',
-        'HOST' : '127.0.0.1',
-        'PORT' : '3306',
+        'NAME': 'Bhg4ybEsQp',
+        'USER': 'Bhg4ybEsQp',
+        'PASSWORD': 'vP8CQ00v1K',
+        'HOST': 'remotemysql.com',
+        'PORT': '3306',
     }
 }
 
