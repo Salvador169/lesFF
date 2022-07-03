@@ -22,7 +22,7 @@ class RegistoMovimento(models.Model):
         saida = ""
         if (self.data_de_saida != None):
             saida = self.data_de_saida
-        return 'AdminManagementParque'.__str__(self.parqueid) + ", Matrícula: " + str(self.matricula) + ", Entrada: " + str(self.data_de_entrada) + ", Saída: " + str(self.data_de_saida)
+        return "Matrícula: " + str(self.matricula) + ", Entrada: " + str(self.data_de_entrada) + ", Saída: " + str(self.data_de_saida)
 
     class Meta:
         db_table = 'RegistoMovimento'

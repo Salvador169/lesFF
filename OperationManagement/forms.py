@@ -156,8 +156,7 @@ class ReclamacaoForm(forms.Form):
         super().__init__(*args, **kwargs)
         p = fatura.pagamentoid
         r = p.registoid
-        v = r.matricula
-        self.fields["registo"].queryset = RegistoMovimento.objects.filter(matricula=v.matricula)
+        self.fields["registo"].queryset = RegistoMovimento.objects.filter(matricula=r.matricula)
 
     def clean_reclamacao(self):
         reclamacao = self.cleaned_data["reclamacao"]
