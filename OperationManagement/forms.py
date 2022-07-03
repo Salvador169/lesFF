@@ -18,7 +18,7 @@ class EntrarParqueForm(forms.Form):
         matricula = self.cleaned_data["matricula"]
         v = Viatura.objects.filter(matricula=matricula)
 
-        if v.exists():
+        if RegistoMovimento.objects.filter(matricula=matricula, data_de_saida=None).count() != 0:
             raise ValidationError("Matrícula já existe no parque.")
 
         if len(matricula) > 10:

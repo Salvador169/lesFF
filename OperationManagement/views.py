@@ -28,8 +28,9 @@ def entrar_parque_form(request, parque_id):
             messages.success(request, f"Entrou no parque com sucesso.")
             r = RegistoMovimento(data_de_entrada=timezone.now(), matricula=form.cleaned_data.get("matricula"), parqueid=parques)
             r.save()
-            v = Viatura(registo_movimentoid=r, matricula=form.cleaned_data.get("matricula"))
-            v.save()
+            if Viatura.objects.filter(matricula=form.cleaned_data.get("matricula")).count() == 0:
+                v = Viatura(registo_movimentoid=r, matricula=form.cleaned_data.get("matricula"))
+                v.save()
 
             return redirect("OperationManagement:index", parque_id=parque_id)
     else:
