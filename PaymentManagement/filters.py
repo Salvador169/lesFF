@@ -1,5 +1,5 @@
 import django_filters
-from .models import Contrato
+from .models import Contrato, Fatura
 from django.db.models import Q
 
 get_valido_choices = [
@@ -22,4 +22,12 @@ class ContratosFilter(django_filters.FilterSet):
 
     class Meta:
         model = Contrato
+        fields = '__all__'
+
+class FaturasFilter(django_filters.FilterSet):
+    nome = django_filters.CharFilter(method=filter_nome)
+    valido = django_filters.MultipleChoiceFilter(choices=get_valido_choices)
+
+    class Meta:
+        model = Fatura
         fields = '__all__'

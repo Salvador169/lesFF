@@ -5,7 +5,7 @@ app_name = "PaymentManagement"
 urlpatterns = [
     #GESTAO DE CONTRATOS
     path('', views.OptionsView.as_view(), name='options'), #consultar contratos
-    path('contrato/', views.contratos_list.as_view(), name='contrato-list'), #consultar contratos
+    path('contrato/', views.ContratoListView.as_view(), name='contrato-list'), #consultar contratos
     path('contrato/<int:id>/', views.contrato_detail_view, name="contrato-detail"), #vista detalhada de um contrato
     path('contrato/criar/', views.contrato_parque_view, name="contrato-parque"), #Escolher parque para criar contrato
     path('contrato/criar/<int:id>', views.contrato_create_view, name="contrato-create"), #dados para criar contrato

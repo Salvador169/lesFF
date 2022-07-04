@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django_tables2 import SingleTableMixin
+from django_tables2 import SingleTableMixin, SingleTableView
 from django.views.generic import ListView
 from django.core.files.storage import FileSystemStorage
 
@@ -15,7 +15,7 @@ from AdminManagement.models import Lugar, Parque
 from OperationManagement.models import RegistoMovimento
 from utilizadores.models import Cliente
 from .models import Reserva, TabelaPrecos
-
+from django.contrib.auth import *
 from .models import Contrato, Dia, Fatura, Pagamento, Reclamacao
 from .forms import ContratoForm, FaturaModelForm, PaymentModelForm, ReclamacaoModelForm
 from django.views.generic import (
@@ -25,17 +25,17 @@ from django.views.generic import (
     UpdateView,
     DeleteView, 
     TemplateView, 
-    View
+    View,
     )
 
-from .tables import ContratosTable
+from .tables import ContratosTable, FaturasTable
 from django_filters.views import FilterView
-from .filters import ContratosFilter
+from .filters import ContratosFilter, FaturasFilter
 from django.db.models import F
 from django.template import loader
 
 #LISTAR OS CONTRATOS
-class contratos_list(SingleTableMixin, FilterView):
+class ContratoListView(SingleTableMixin, FilterView):
     table_class = ContratosTable
     template_name = 'contratos.html'
     filterset_class = ContratosFilter
@@ -51,6 +51,16 @@ class contratos_list(SingleTableMixin, FilterView):
         table = self.get_table(**self.get_table_kwargs())
         context[self.get_context_table_name(table)] = table
         return context
+    
+    def get_table_data(self):
+        try:
+            cliente = Cliente.objects.get(pk=get_user(self.request))
+        except:
+            cliente=None
+        contratos = Contrato.objects.filter(clienteid=cliente)
+        return contratos
+
+        
     
 #CONSULTAR CONTRATO
 def contrato_detail_view(request, id):
@@ -155,13 +165,30 @@ class SuccessView(TemplateView):
 class CancelView(TemplateView):
     template_name = "cancel.html"
 
-class FaturaListView(View):
+class FaturaListView(SingleTableMixin, FilterView):
+    table_class = FaturasTable
     template_name = 'fatura_list.html'
-    queryset = Fatura.objects.all()
+    filterset_class = FaturasFilter
+    table_pagination = {
+        'per_page': 10
+    }
 
-    def get(self, request, *args, **kwargs):
-        context = {"object_list": self.queryset}
-        return render(request, self.template_name, context)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(SingleTableMixin, self).get_context_data(**kwargs)
+        table = self.get_table(**self.get_table_kwargs())
+        context[self.get_context_table_name(table)] = table
+        return context
+    
+    def get_table_data(self):
+        try:
+            cliente = Fatura.objects.get(pk=get_user(self.request))
+        except:
+            cliente=None
+        faturas = Fatura.objects.filter(clienteid=cliente)
+        return faturas
 
 class FaturaDeleteView(DeleteView):
     template_name = 'fatura_delete.html'
@@ -238,10 +265,11 @@ def payment_prove_create_view(request, id):
     return render(request, "payment_prove.html")
 
 def payment_create_view(request, id, payid):
+    contrato = Contrato.objects.get(id = id)
     price = TabelaPrecos.getPrice(contrato = contrato, all=False)
     if request.method=='POST':
         form = PaymentModelForm(request.POST)
-        contrato = Contrato.objects.get(id = id)
+        
         payment = Pagamento.objects.get(id = payid)
         if form.is_valid():
             payment.estado_do_pagamento = "Pago"
