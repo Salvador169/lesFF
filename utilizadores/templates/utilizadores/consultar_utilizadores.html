@@ -1,23 +1,28 @@
 {% extends 'base.html' %}
+
 {% load django_tables2 %}
 {% load static %}
 {% block content %}
-{% block PageTittle %}- Consultar Utilizadores
-{% endblock %}
 
 {% block loggedInContent %}
 <div class="columns">
     <div class="column is-3">
-        <div class="menu">
-            <div class="menu-label">
-                Filtros Utilizadores
+        <div class="menu" style="margin-left: 5%">
+            <br>
+            <h2 class="text-primary" style="text-align:center">Consultar Utilizadores</h2>
+            <div class="menu-label" >
+                Filtros Utilizadores:
             </div>
             <form method="get">
-                <ul class="menu-list">
+                <p class="menu-list">
                     <li>
                         <div class="field">
                             <div class="control has-icons-left">
-                                <input class="input" name="{{ filter.form.nome.name }}" 
+                                <input class="input" style="outline: none;
+                                border: 3px double black;
+                                width: 25%;
+                                color: #757575;
+                                border-radius: 5px;" name="{{ filter.form.nome.name }}" 
                                     value="{{ filter.form.nome.value|default_if_none:'' }}" type="text"
                                     placeholder="Nome">
                                 <span class="icon is-left">
@@ -25,10 +30,11 @@
                                 </span>
                             </div>
                         </div>
+                        <br>
                         <div class="field">
                             <label>Tipos:</label>
                         </div>
-                        <ul>
+      
                             {% for value, label in filter.form.fields.groups.choices %}
                             <div class="field" style="padding-left: 1rem;">
                                 <label class="checkbox">
@@ -42,11 +48,10 @@
                             {% endfor %}
                         </ul>
                     </li>
-                    <li>
+<br>
                         <div class="field">
                             <label>Estados:</label>
                         </div>
-                        <ul>
                             {% for value, label in filter.form.fields.valido.choices %}
                             <div class="field" style="padding-left: 1rem;">
                                 <label class="checkbox">
@@ -57,40 +62,26 @@
                                 </label>
                             </div>
                             {% endfor %}
-                        </ul>
-                    </li>
                 </ul>
+                <br>
                 <div class="field is-grouped">
                     <p class="control is-expanded">
-                        <input class="button is-light is-fullwidth" type="reset"
-                            onclick="event.preventDefault(); window.location='{% url 'utilizadores:consultar-utilizadores' %}';"
-                            value="Limpar">
-                    </p>
-                    <p class="control is-expanded">
-                        <button class="button is-primary is-fullwidth" type="submit">
+                        <button class="button is-primary is-fullwidth btn btn-sm btn-primary" type="submit">
                             <span class="icon">
                                 <i class="mdi mdi-magnify"></i>
                             </span>
                             <span>Pesquisar</span>
                         </button>
+                        &nbsp&nbsp&nbsp
+                        <input class="button is-light is-fullwidth btn btn-sm btn-primary" type="reset"
+                            onclick="event.preventDefault(); window.location='{% url 'utilizadores:consultar-utilizadores' %}';"
+                            value="Limpar">
                     </p>
                 </div>
             </form>
         </div>
     </div>
     <div class="column">
-        <nav aria-label="breadcrumbs" class="breadcrumb">
-            <ul>
-                <li><a href="{% url 'homepage' %}">Início</a></li>
-                <li class="is-active"><a href="{% url 'utilizadores:consultar-utilizadores' %}">Utilizadores</a>
-                </li>
-            </ul>
-        </nav>
-        <a href="{% url 'utilizadores:escolher-perfil' %}">
-            <button type="button" class="button is-success is-outlined" style="margin-bottom: 1rem;"><span
-                    class="icon is-small"><i class="mdi mdi-plus"></i></span> <span>Adicionar Utilizador</span>
-            </button>
-        </a>
         {% render_table table 'utilizadores/consultar_utilizadores_tabela.html' %}
     </div>
 </div>

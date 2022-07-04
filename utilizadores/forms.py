@@ -181,7 +181,7 @@ class FuncionarioRegisterForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     username=CharField(widget=TextInput(attrs={'class':'input','style':''}), label="Nome de Utilizador", max_length=255, required=False)
-    password=CharField(widget=PasswordInput(attrs={'class':'input','style':''}), label= 'Senha', max_length=255, required=False)
+    password=CharField(widget=PasswordInput(attrs={'class':'input1','style':''}), label= 'Senha', max_length=255, required=False)
 
 
 
