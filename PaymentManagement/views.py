@@ -53,11 +53,14 @@ class ContratoListView(SingleTableMixin, FilterView):
         return context
     
     def get_table_data(self):
-        try:
-            cliente = Cliente.objects.get(pk=get_user(self.request))
-        except:
-            cliente=None
-        contratos = Contrato.objects.filter(clienteid=cliente)
+        if self.request.user.is_staff == 1:
+            contratos=Contrato.objects.all()
+        else:
+            try:
+                cliente=Cliente.objects.get(pk=get_user(self.request))
+            except:
+                cliente=None
+            contratos=Contrato.objects.filter(clienteid=cliente)
         return contratos
 
         
@@ -183,11 +186,14 @@ class FaturaListView(SingleTableMixin, FilterView):
         return context
     
     def get_table_data(self):
-        try:
-            cliente = Fatura.objects.get(pk=get_user(self.request))
-        except:
-            cliente=None
-        faturas = Fatura.objects.filter(clienteid=cliente)
+        if self.request.user.is_staff == 1:
+            faturas= Fatura.objects.all()
+        else:
+            try:
+                cliente = Fatura.objects.get(pk=get_user(self.request))
+            except:
+                cliente=None
+            faturas = Fatura.objects.filter(clienteid=cliente)
         return faturas
 
 class FaturaDeleteView(DeleteView):
@@ -364,8 +370,13 @@ def registo_payment_create_view(request, id):
 class OptionsView(TemplateView):
     template_name = "options.html"
 
-class PaymentOptionsView(TemplateView):
-    template_name = "pay_options.html"
+def payment_options_view(request, id, payid):
+    template = loader.get_template('pay_options.html')
+    context ={
+        'id': id,
+        'payid': payid,
+    }
+    return HttpResponse(template.render(context, request))
 
 
 def emit_fatura_view(request, id):

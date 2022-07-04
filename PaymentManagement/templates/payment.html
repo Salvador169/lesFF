@@ -1,8 +1,18 @@
+{% include "base.html"%}
 {% block content %}
+<br/>
+<head>
+    <style>
+      form, a {
+          margin-left: 40%;
+      }
+    </style>
+</head>
 <form method="POST"> {% csrf_token %}
     {{form.as_p}}
     <p>{{price}}€</p>
-    <input type="submit" value="Save"/>
+    <input class="btn btn-sm btn-primary" type="submit" value="Save"/>
 </form>
 {% endblock %}
-<a class="btn btn-info btn-sm" href="{% url 'PaymentManagement:options' %}">Voltar à página principal</a>
+<br/>
+<a class="btn btn-sm btn-primary" href="{% url 'homepage' %}">Voltar à página principal</a>
