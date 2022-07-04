@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from AdminManagement.models import Lugar, Parque, Zona
-from PaymentManagement.models import Fatura, Reclamacao, Pagamento, Contrato, Reserva
+from PaymentManagement.models import Fatura, Reclamacao, Pagamento, Contrato, Reserva, TabelaPrecos
 from .forms import AssociarLugarForm, DesassociarLugarForm, EntrarParqueForm, ReclamacaoForm, RegistoMovimentoModelForm, SairParqueForm
 
 from .models import RegistoMovimento, Viatura
@@ -61,25 +61,25 @@ def sair_parque_form(request, parque_id):
         if form.is_valid():
             viatura = Viatura.objects.get(matricula=form.cleaned_data.get("matricula"))
             contrato = Contrato.objects.filter(matricula=form.cleaned_data.get("matricula"))
-            reserva = Reserva.objects.filter(viaturaid=viatura)
+            reserva = Reserva.objects.get(viaturaid=viatura)
+            r = RegistoMovimento.objects.get(matricula=form.cleaned_data.get("matricula"), data_de_saida=None)
             if contrato.exists():
-                r = RegistoMovimento.objects.get(matricula=form.cleaned_data.get("matricula"), data_de_saida=None)
                 if r is not None:
                     r.data_de_saida = timezone.now()
                     r.save()
                 return redirect("OperationManagement:entrar_parque")
-            elif reserva.exists():
+            elif reserva != None:
                 pagamento = Pagamento()
-                pagamento.reserva = reserva
+                pagamento.reservaid = reserva
                 pagamento.estado_do_pagamento = "Pendente"
-                pagamento.montante = 1111
+                pagamento.montante = TabelaPrecos.getPrice(reserva = reserva, all=False)
                 pagamento.save()
                 return redirect("PaymentManagement:reserva-pay", id=reserva.id)
             else:
                 pagamento = Pagamento()
                 pagamento.registoid = viatura.registo_movimentoid
                 pagamento.estado_do_pagamento = "Pendente"
-                pagamento.montante = 3123
+                pagamento.montante = TabelaPrecos.getPrice(registo = r, all=False)
                 pagamento.save()
                 return redirect("PaymentManagement:registo-pay", id=viatura.registo_movimentoid.id)
             
@@ -236,3 +236,14 @@ def processar_reclamacao(request, parque_id, reclamacao_id):
     return render(request=request,
               template_name="main/processar_reclamacao.html",
               context={"parques": parques, "form": form, "reclamacao": reclamacao})
+
+def sair_parque(request):
+    return render(request=request,
+                  template_name="main/sair_parque.html",
+                  context={"parques": Parque.objects.all()})
+
+
+def operar_parque(request):
+    return render(request=request,
+                  template_name="main/operar_parque.html",
+                  context={"parques": Parque.objects.all()})

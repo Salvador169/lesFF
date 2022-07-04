@@ -246,11 +246,11 @@ class TabelaPrecos(models.Model):
         elif reserva:
             tabelaPrecos = TabelaPrecos.objects.get(parqueid = reserva.parqueid)
             dias = TabelaPrecos.getHoursReserva(reserva = reserva)
-            price = dias.seconds/3600 * tabelaPrecos.preco_por_hora
+            price = dias.total_seconds()/3600 * tabelaPrecos.preco_por_hora
         else:
             tabelaPrecos = TabelaPrecos.objects.get(parqueid = registo.parqueid)
             dias = TabelaPrecos.getTime(date = registo.data_de_entrada)
-            price = dias.seconds/3600 * tabelaPrecos.preco_por_hora
+            price = dias.total_seconds()/3600 * tabelaPrecos.preco_por_hora
         return "{:.2f}".format(price)
 
     class Meta:

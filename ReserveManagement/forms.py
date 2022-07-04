@@ -1,10 +1,12 @@
+import re
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, ValidationError
 
 from AdminManagement.models import Lugar, Parque
-from OperationManagement.models import Viatura
+from OperationManagement.models import TabelaMatriculas, Viatura
 from PaymentManagement.models import Reserva, TabelaPrecos
 import datetime
+import time
 
 class ParqueModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -21,13 +23,13 @@ class ViaturaModelChoiceField(forms.ModelChoiceField):
 class CreateReserve(ModelForm):
     OPTIONS_parque = Reserva.makeOptions()
     # parqueid = forms.CharField(widget=forms.Select(choices=OPTIONS_parque, attrs={'class' : 'input'}), label='Parque', required=True)
-    parqueid = ParqueModelChoiceField(label="Parque", queryset=Parque.objects.all(), required=True)
-    data_de_inicio = forms.DateField(label="Data de Início", widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    data_de_termino = forms.DateField(label="Data de Término", widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    hora_de_inicio = forms.TimeField(label="Hora de Início", widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
-    hora_de_termino = forms.TimeField(label="Hora de Término", widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
-    lugar = LugarModelChoiceField(label="Lugar", queryset=Lugar.objects.filter(reservaid__isnull = True).filter(contratoid__isnull = True), required=True)
-    viaturaid = ViaturaModelChoiceField(label="Matrícula", queryset=Viatura.objects.all(), required=True)
+    parqueid = ParqueModelChoiceField(label="Parque", queryset=Parque.objects.all(), required=True, widget=forms.Select(attrs={'class': 'field2'}))
+    data_de_inicio = forms.DateField(label="Data de Início", widget=forms.widgets.DateInput(attrs={'type': 'date', 'class': 'field1'}))
+    data_de_termino = forms.DateField(label="Data de Término", widget=forms.widgets.DateInput(attrs={'type': 'date', 'class': 'field1'}))
+    hora_de_inicio = forms.TimeField(label="Hora de Início", widget=forms.widgets.TimeInput(attrs={'type': 'time', 'class': 'field'}))
+    hora_de_termino = forms.TimeField(label="Hora de Término", widget=forms.widgets.TimeInput(attrs={'type': 'time', 'class': 'field'}))
+    lugar = LugarModelChoiceField(label="Lugar", queryset=Lugar.objects.filter(reservaid__isnull = True).filter(contratoid__isnull = True), required=True, widget=forms.Select(attrs={'class': 'field2'}))
+    viaturaid = ViaturaModelChoiceField(label="Matrícula", queryset=Viatura.objects.all(), required=True,widget=forms.Select(attrs={'class': 'field2'}))
 
     class Meta:
         model = Reserva
@@ -48,19 +50,22 @@ class CreateReserve(ModelForm):
         hora_termino = self.cleaned_data.get('hora_de_termino')
         data_inicio = self.cleaned_data.get('data_de_inicio')
         data_termino = self.cleaned_data.get('data_de_termino')
+        hora_atual = datetime.datetime.now().time()
         if  data_inicio == data_termino and hora_termino < hora_inicio:
             raise forms.ValidationError("A hora de término precisa ser maior que a hora de início")
+        if data_inicio == datetime.date.today() and hora_inicio < hora_atual:
+            raise forms.ValidationError("A hora precisa de ser maior que a atual")
         return hora_termino
 
 class CreateTable(ModelForm):
-    parqueid = ParqueModelChoiceField(label="Parque", queryset=Parque.objects.all(), required=True)
-    preco_por_hora = forms.FloatField()
-    taxa_por_hora = forms.FloatField()
-    taxa_noturna = forms.FloatField()
-    taxa_da_multa = forms.FloatField()
-    preco_contrato_dia = forms.FloatField()
-    preco_contrato_diurno = forms.FloatField()
-    preco_contrato_noturno = forms.FloatField()
+    parqueid = ParqueModelChoiceField(label="Parque", queryset=Parque.objects.all(), required=True, widget=forms.Select(attrs={'class': 'field2'}))
+    preco_por_hora = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'field1'}))
+    taxa_por_hora = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'field1'}))
+    taxa_noturna = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'field1'}))
+    taxa_da_multa = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'field1'}))
+    preco_contrato_dia = forms.FloatField(label="Preço do contrato/dia", widget=forms.NumberInput(attrs={'class': 'field1'}))
+    preco_contrato_diurno = forms.FloatField(label="Preço do contrato diurno", widget=forms.NumberInput(attrs={'class': 'field1'}))
+    preco_contrato_noturno = forms.FloatField(label="Preço do contrato noturno", widget=forms.NumberInput(attrs={'class': 'field1'}))
 
     class Meta:
         model = TabelaPrecos
@@ -176,3 +181,22 @@ class UpdateTable(ModelForm):
         if data < 0:
             raise forms.ValidationError("O valor necessita ser positivo")
         return data
+
+class MatriculaForm(forms.Form):
+    matricula = forms.CharField(label="Matrícula")
+
+    def clean_matricula(self):
+        matricula = self.cleaned_data["matricula"]
+        v = Viatura.objects.filter(matricula=matricula).count()
+
+        if len(matricula) > 10:
+            raise ValidationError("Matrícula deve conter menos de 11 caracteres.")
+
+        t = TabelaMatriculas.objects.values_list('formato')
+
+        
+       
+        if v == 0:
+            raise ValidationError("Não existe nenhuma reserva com a matrícula introduzida")
+
+        return matricula

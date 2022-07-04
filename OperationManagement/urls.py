@@ -14,6 +14,8 @@ urlpatterns = [
     path("associar_lugar/<int:parque_id>/<int:zona_id>/", views.associar_lugar, name="associar_lugar"),
     path("desassociar_lugar/<int:parque_id>/<int:zona_id>/", views.desassociar_lugar, name="desassociar_lugar"),
     path("ver_lugares/<int:parque_id>/<int:zona_id>/", views.ver_lugares, name="ver_lugares"),
+    path("operar_parque/", views.operar_parque, name="operar_parque"),
+    path("sair_parque/", views.sair_parque, name="sair_parque"),
 
     # path('reclamacao/', views.ReclamacaoListView.as_view(), name='reclamacao-list'), #consultar reclamacoes
     # path("consultar_entradas/<int:parque_id>/<int:fatura_id>/", views.consultar_entradas, name="consultar_entradas"), #reclamar fatura

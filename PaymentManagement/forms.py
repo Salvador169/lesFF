@@ -1,7 +1,7 @@
 from django import forms
 
 from AdminManagement.models import Lugar
-from .models import Contrato, Dia, Fatura, Pagamento, Periodicidade, Reclamacao        
+from .models import Contrato, Dia, Fatura, Pagamento, Periodicidade, Reclamacao, TabelaPrecos        
 import datetime
 from creditcards.forms import CardNumberField, CardExpiryField, SecurityCodeField
 
@@ -108,7 +108,7 @@ class ContratoForm(forms.ModelForm):
         newPayment = Pagamento()
         newPayment.contratoid = newContrato
         newPayment.estado_do_pagamento = "Pendente"
-        newPayment.montante = 30
+        newPayment.montante = TabelaPrecos.getPrice(contrato = newContrato, all=False)
         newPayment.data_de_vencimento = self.cleaned_data.get('data_de_inicio') + datetime.timedelta(days = 7)
         newPayment.save()
 

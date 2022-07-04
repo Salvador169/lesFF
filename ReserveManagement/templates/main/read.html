@@ -1,66 +1,47 @@
 {% extends 'base.html' %}
-<!doctype html>
+
 {% block content %}
+{% load render_table from django_tables2 %}
 <html>
-<head>
-    <style>
-        table {
-            width: 90%;
-            margin: auto;
-        }
+    <head>
+        <style>
+            table {
+                width: 90%;
+                margin: auto;
+            }
 
-        td, th {
-            border: 1px solid #dddddd;
-            text-align: center;
-            padding: 8px;
-        } 
+            td, th {
+                border: 1px solid #dddddd;
+                text-align: center;
+                padding: 8px;
+            } 
 
-        tr:nth-child() {
-            background-color: #dddddd;
-        }
-        h2 {
-            width: 90%;
-            margin: auto;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
+            tr:nth-child() {
+                background-color: #dddddd;
+            }
+            h2 {
+                width: 90%;
+                margin: auto;
+                text-align: center;
+            }
+        </style>
+    </head>
+    
+    <body>
 
+        <br>
 
-    <!-- Recent Sales Start -->
-    <table class="">
-        <thead>
-            <tr class="">
-                <th scope="col">Parque</th>
-                <th scope="col">Matrícula</th>
-                <th scope="col">Data de Início</th>
-                <th scope="col">Data de Término</th>
-                <th scope="col">Hora de Início</th>
-                <th scope="col">Hora de Término</th>
-                <th scope="col">Editar</th>
-                <th scope="col">Apagar</th>
-            </tr>
-        </thead>
-        <tbody>    
-            {% for r in reservas %}
-                <tr>
-                    <td>{{r.parqueid.nome}}</td>
-                    <td>{{r.viaturaid.matricula}}</td>
-                    <td>{{r.data_de_inicio}}</td>
-                    <td>{{r.data_de_termino}}</td>
-                    <td>{{r.hora_de_inicio}}</td>
-                    <td>{{r.hora_de_termino}}</td>
-                    <td><a class="btn btn-sm btn-primary" href="../update/{{r.id}}">Editar</a></td>
-                    <td><a class="btn btn-sm btn-primary" style="background-color: red; border-color: red" href="../delete/{{r.id}}">Apagar</a></td>
-                </tr>
-            {% endfor %}                           
-        </tbody>
-    </table>
-    <br>
-    <form action="../">
-        <input class="btn btn-sm btn-primary" style="margin-left: 5%" type="submit" value="Voltar">
-    </form>
-</body>
+        <h2 class="text-primary">Lista de reservas</h2>
+        
+        <br>
+        
+        {% render_table table %}
+        
+        <br>
+        
+        <form action="/">
+            <input class="btn btn-sm btn-primary" style="margin-left: 5%" type="submit" value="Voltar" />
+        </form>
+    </body>
 </html>
 {% endblock %}

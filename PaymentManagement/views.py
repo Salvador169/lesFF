@@ -311,17 +311,14 @@ def payment_create_view_reference(request, id, payid):
 
 def reserva_payment_create_view(request, id):
     reserva = Reserva.objects.get(id = id)
-    price = TabelaPrecos.getPrice(reserva = reserva, date=reserva.data_de_inicio, all=False)
+    payment = Pagamento.objects.get(reservaid=reserva)
     if request.method=='POST':
         form = PaymentModelForm(request.POST)   
         if form.is_valid():
-            payment = Pagamento()
             payment.data_de_vencimento = datetime.datetime.now()
             payment.estado_do_pagamento = "Pago"
-            payment.montante = price
-            payment.reservaid = reserva
             payment.save()
-            registo = RegistoMovimento.objects.get(id = reserva.viaturaid.registo.movimentoid.id)
+            registo = RegistoMovimento.objects.get(id = reserva.viaturaid.registo_movimentoid.id)
             registo.data_de_saida = datetime.datetime.now()
             registo.save()
             fatura = Fatura()
@@ -335,21 +332,18 @@ def reserva_payment_create_view(request, id):
     
     context ={
         'form': form,
-        'price': price,
+        'price': payment.montante,
     }
     return render(request, "payment.html", context)
 
 def registo_payment_create_view(request, id):
     registo = RegistoMovimento.objects.get(id = id)
-    price = TabelaPrecos.getPrice(registo = registo, all=False)
+    payment = Pagamento.objects.get(registoid=registo)
     if request.method=='POST':
         form = PaymentModelForm(request.POST)
         if form.is_valid():
-            payment = Pagamento()
             payment.data_de_vencimento = datetime.datetime.now()
             payment.estado_do_pagamento = "Pago"
-            payment.montante = price
-            payment.registoid = registo
             payment.save()
             registo.data_de_saida = datetime.datetime.now()
             registo.save()
@@ -363,7 +357,7 @@ def registo_payment_create_view(request, id):
     
     context ={
         'form': form,
-        'price': price,
+        'price': payment.montante,
     }
     return render(request, "payment.html", context)
 

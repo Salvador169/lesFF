@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<html>
+    <head>
+        
+    </head>
+    <body>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger" style="margin-top:1%; position: absolute">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <h2 style="margin-top: 20%; color: #009cff; text-align: center;">Ecolha uma Matrícula</h2>
+
+        <br>
+
+        <form method="POST">
+            {% csrf_token %}
+
+             {{ form }}
+             <br>
+             <a class="btn btn-danger" style="color: white; margin-right: 2em; margin-top: 2em" href="../">Voltar</a>
+             <button class="btn btn-primary" style="margin-top: 2em" type="submit">Confirmar</button>
+         </form>    
+    </body>
+</html>
+
+{% endblock %} 
